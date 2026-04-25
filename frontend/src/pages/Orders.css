@@ -1,0 +1,14 @@
+.orders-page { padding: 30px 0 60px; }
+.orders-page h1 { font-size: 28px; font-weight: 700; margin-bottom: 24px; }
+.orders-list { display: flex; flex-direction: column; gap: 16px; }
+.order-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; transition: box-shadow 0.2s; border: 1.5px solid transparent; }
+.order-card:hover { box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.order-card-header { display: flex; align-items: center; justify-content: space-between; }
+.order-id { font-size: 15px; font-weight: 700; display: block; }
+.order-date { font-size: 13px; color: var(--gray); }
+.order-card-right { display: flex; align-items: center; gap: 10px; }
+.order-items-preview { display: flex; align-items: center; gap: 8px; }
+.order-items-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+.more-items { width: 50px; height: 50px; background: var(--light-gray); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--gray); }
+.order-items-count { font-size: 13px; color: var(--gray); margin-left: 4px; }
+.order-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; font-size: 14px; }

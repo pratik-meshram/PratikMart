@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #6c63ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #5a52d5; }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Authentication Test</h1>
+    
+    <div id="status"></div>
+    
+    <h2>Step 1: Check LocalStorage</h2>
+    <button onclick="checkLocalStorage()">Check User in LocalStorage</button>
+    
+    <h2>Step 2: Test Login</h2>
+    <div>
+        <input type="email" id="email" placeholder="Email" value="admin@shop.com">
+        <input type="password" id="password" placeholder="Password" value="admin123">
+        <button onclick="testLogin()">Login</button>
+    </div>
+    
+    <h2>Step 3: Test Payment Endpoint</h2>
+    <button onclick="testPaymentEndpoint()">Test Payment API</button>
+    
+    <h2>Logs:</h2>
+    <pre id="logs"></pre>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        
+        function log(message, type = 'info') {
+            const logsEl = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsEl.textContent += `[${timestamp}] ${message}\n`;
+            
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = message;
+        }
+
+        function checkLocalStorage() {
+            const user = localStorage.getItem('user');
+            
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    log('✅ User found in localStorage', 'success');
+                    console.log('User data:', userData);
+                    
+                    if (userData.token) {
+                        log(`✅ Token exists: ${userData.token.substring(0, 20)}...`, 'success');
+                    } else {
+                        log('❌ No token in user data', 'error');
+                    }
+                } catch (e) {
+                    log('❌ Invalid user data in localStorage', 'error');
+                }
+            } else {
+                log('❌ No user in localStorage. Please login.', 'error');
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                log('Attempting login...', 'info');
+                
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('user', JSON.stringify(data));
+                    log('✅ Login successful! User saved to localStorage', 'success');
+                    console.log('User data:', data);
+                } else {
+                    const error = await response.json();
+                    log(`❌ Login failed: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Login error: ${error.message}`, 'error');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function testPaymentEndpoint() {
+            const user = localStorage.getItem('user');
+            
+            if (!user) {
+                log('❌ No user in localStorage. Login first!', 'error');
+                return;
+            }
+            
+            try {
+                const userData = JSON.parse(user);
+                
+                if (!userData.token) {
+                    log('❌ No token found. Login again!', 'error');
+                    return;
+                }
+                
+                log('Testing payment endpoint with token...', 'info');
+                
+                // Test 1: Get key (no auth required)
+                const keyResponse = await fetch(`${API_URL}/payment/key`);
+                const keyData = await keyResponse.json();
+                log(`✅ Payment key retrieved: ${keyData.key}`, 'success');
+                
+                // Test 2: Create order (auth required)
+                const orderResponse = await fetch(`${API_URL}/payment/create-order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userData.token}`
+                    },
+                    body: JSON.stringify({ amount: 100, currency: 'INR' })
+                });
+                
+                if (orderResponse.ok) {
+                    const orderData = await orderResponse.json();
+                    log('✅ Payment order created successfully!', 'success');
+                    console.log('Order data:', orderData);
+                } else if (orderResponse.status === 401) {
+                    log('❌ 401 Unauthorized - Token is invalid or expired', 'error');
+                    const error = await orderResponse.json();
+                    console.error('Error:', error);
+                } else {
+                    const error = await orderResponse.json();
+                    log(`❌ Error: ${error.message}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Test error: ${error.message}`, 'error');
+                console.error('Test error:', error);
+            }
+        }
+
+        // Auto-check on load
+        window.onload = function() {
+            log('Page loaded. Click buttons to test.', 'info');
+            setTimeout(checkLocalStorage, 500);
+        };
+    </script>
+</body>
+</html>

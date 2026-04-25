@@ -1,0 +1,28 @@
+.order-detail-page { padding: 30px 0 60px; }
+.order-detail-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.order-detail-header h1 { font-size: 24px; font-weight: 700; }
+.order-header-right { display: flex; align-items: center; gap: 12px; }
+.order-progress { margin-bottom: 24px; }
+.progress-steps { display: flex; align-items: center; }
+.progress-step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; }
+.progress-step::before { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0; }
+.progress-step:last-child::before { display: none; }
+.progress-step.done::before { background: var(--success); }
+.progress-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; color: white; z-index: 1; position: relative; }
+.progress-step.done .progress-dot { background: var(--success); }
+.progress-step.current .progress-dot { background: var(--primary); box-shadow: 0 0 0 4px #e8e6ff; }
+.progress-step span { font-size: 12px; font-weight: 500; color: #aaa; text-transform: capitalize; }
+.progress-step.done span, .progress-step.current span { color: #444; }
+.order-detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+.order-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.order-item:last-child { border-bottom: none; }
+.order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+.order-item-info { flex: 1; }
+.order-item-info a:hover { color: var(--primary); }
+.order-item-price { font-size: 15px; font-weight: 700; }
+.order-summary-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.summary-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 10px; }
+.summary-total { display: flex; justify-content: space-between; font-size: 17px; font-weight: 700; border-top: 1px solid var(--border); padding-top: 12px; margin: 4px 0 16px; }
+.payment-method-box { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.payment-method-box span:first-child { color: var(--gray); }
+@media (max-width: 768px) { .order-detail-grid { grid-template-columns: 1fr; } }
